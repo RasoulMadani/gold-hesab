@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاسبه وزن طلای معادل</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+            margin: 20px;
+        }
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 200px;
+            padding: 5px;
+            text-align: left;
+            direction: ltr;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>محاسبه وزن طلای معادل</h1>
+
+    <label for="price">قیمت لحظه‌ای هر گرم طلای ۱۸ عیار (تومان):</label>
+    <input type="text" id="price" oninput="formatNumberInput(this)" required>
+
+    <label for="amount">مبلغ واریزی مشتری (تومان):</label>
+    <input type="text" id="amount" oninput="formatNumberInput(this)" required>
+
+    <button onclick="calculateWeight()">محاسبه وزن</button>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        function formatNumberInput(input) {
+            // ذخیره موقعیت مکان‌نما (cursor)
+            let cursorPosition = input.selectionStart;
+            
+            // حذف کاماها و دریافت مقدار خالص عددی
+            let value = input.value.replace(/,/g, '');
+
+            // بررسی مقدار نامعتبر (حروف یا نماد)
+            if (!/^\d*$/.test(value)) {
+                return;
+            }
+
+            // افزودن جداکننده سه‌رقمی
+            let formattedValue = Number(value).toLocaleString('fa-IR');
+
+            // مقدار جدید را به فیلد ورودی برمی‌گردانیم
+            input.value = formattedValue;
+
+            // بازگرداندن مکان‌نمای کاربر به موقعیت مناسب
+            let newPosition = cursorPosition + (formattedValue.length - value.length);
+            input.setSelectionRange(newPosition, newPosition);
+        }
+
+        function calculateWeight() {
+            // دریافت مقادیر ورودی و حذف کاماها
+            const pricePerGram = parseFloat(document.getElementById('price').value.replace(/,/g, ''));
+            const customerAmount = parseFloat(document.getElementById('amount').value.replace(/,/g, ''));
+
+            // بررسی معتبر بودن مقادیر ورودی
+            if (isNaN(pricePerGram) || isNaN(customerAmount) || pricePerGram <= 0 || customerAmount <= 0) {
+                alert('لطفاً مقادیر معتبر وارد کنید.');
+                return;
+            }
+
+            // افزودن ۲٪ به قیمت هر گرم طلا
+            const adjustedPrice = pricePerGram * 1.02;
+
+            // محاسبه وزن طلای معادل (به گرم)
+            const goldWeightGram = customerAmount / adjustedPrice;
+
+            // تبدیل گرم به سوت (۱۰۰۰ سوت = ۱ گرم)
+            const goldWeightSoot = Math.round(goldWeightGram * 1000);
+
+            // استخراج گرم و سوت
+            const grams = Math.floor(goldWeightSoot / 1000); // قسمت صحیح گرم
+            const soots = goldWeightSoot % 1000; // باقی‌مانده به عنوان سوت
+
+            // نمایش نتیجه
+            document.getElementById('result').innerText = `وزن طلای معادل: ${grams} گرم و ${soots} سوت`;
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> محاسبه گرم قلک طلا</title>
+    <link rel="stylesheet" href="./main.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+            margin: 20px;
+        }
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 250px;
+            padding: 5px;
+            text-align: left;
+            direction: ltr;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+
+    <h1> محاسبه گرم قلک طلا طلای طاها</h1>
+
+    <label for="numberInput">قیمت لحظه ای را وارد کنید:</label>
+    <input type="number" id="numberInput" oninput="updateFormattedNumber()">
+
+    <div class="result" id="formattedOutput"></div>
+
+
+    <label for="numberInput">مبلغ واریزی را وارد کنید:</label>
+    <input type="number" id="numberInput1" oninput="updateFormattedNumber2()">
+
+    <div class="result" id="formattedOutput2"></div>
+
+
+    <div class="result" id="result"></div><br>
+
+
+    <textarea id="myText" rows="8" cols="40">
+        .....
+        </textarea><br/>
+        <div style="display: flex;justify-content: start; align-items: start;">
+            <button onclick="copyText()">کپی کردن متن</button>
+            <p id="pcopy" style="display: none;">متن کپی شد .</p>
+        </div>
+       
+    <script>
+        let priceLahzeh;
+        function updateFormattedNumber() {
+            let input = document.getElementById('numberInput').value.replace(/,/g, '');
+            
+            if (!/^\d*$/.test(input)) return; // اگر عدد نبود، اجرا نکند
+            
+           priceLahzeh = Number(input).toLocaleString('fa-IR'); // جدا کردن سه‌رقمی
+
+            document.getElementById('formattedOutput').innerText = priceLahzeh;
+        }
+        let priceVarize ;
+        function updateFormattedNumber2() {
+            let input = document.getElementById('numberInput1').value.replace(/,/g, '');
+            
+            if (!/^\d*$/.test(input)) return; // اگر عدد نبود، اجرا نکند
+            
+            priceVarize = Number(input).toLocaleString('fa-IR'); // جدا کردن سه‌رقمی
+
+            document.getElementById('formattedOutput2').innerText = priceVarize;
+            claculte();
+        }
+
+            function claculte(){
+            // افزودن ۲٪ به قیمت هر گرم طلا
+            const adjustedPrice = document.getElementById('numberInput').value * 1.02;
+
+            // محاسبه وزن طلای معادل (به گرم)
+            const goldWeightGram = document.getElementById('numberInput1').value / adjustedPrice;
+
+            // تبدیل گرم به سوت (۱۰۰۰ سوت = ۱ گرم)
+            const goldWeightSoot = goldWeightGram * 1000;
+            const goldWeightSoot1 = goldWeightSoot.toFixed(0); 
+            let sootOrGram = goldWeightSoot1.length > 3 ? 'گرم' : 'سوت'
+            let vazne = `${Number(goldWeightSoot1).toLocaleString('fa-IR')} ${sootOrGram}`
+            // نمایش نتیجه
+            document.getElementById('result').innerText = `وزن طلای معادل: ${vazne}`;
+            createReshteh(vazne);
+            }
+            let date;
+            let time;
+            function getTime() {
+                fetch("https://api.keybit.ir/time/")
+                    .then(response => response.json()) // تبدیل پاسخ به JSON
+                    .then(data => {
+                        date =  data.date.full.official.iso.fa;
+                        time = data.time24.full.fa;
+                        console.log(data)
+                        
+                    })
+                    .catch(error => console.error("خطا در دریافت داده:", error));
+            }
+
+            // دریافت زمان هنگام بارگذاری صفحه
+            getTime();
+            function createReshteh(vazne){
+                let reshteh = `واریزی اول : ${date}  ---- ${time}
+
+قیمت لحظه طلا: ${priceLahzeh}   تومان
+
+مبلغ واریزی: ${priceVarize}   تومان
+
+‌وزن طلا: ${vazne}`;
+            console.log(reshteh)
+            document.getElementById('myText').innerHTML = reshteh;
+            }
+  
+            function copyText() {
+            // دریافت متن از textarea
+            const text = document.getElementById("myText").value;
+
+            // استفاده از Clipboard API برای کپی کردن
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    document.getElementById('pcopy').style.display = 'block';
+                    
+                    setTimeout(function() {
+                        document.getElementById("pcopy").style.display = "none";
+                    }, 1000); // 1000 میلی‌ثانیه = 1 ثانیه
+                
+                })
+                .catch((error) => {
+                    console.error("خطا در کپی کردن متن:", error);
+                });
+        }
+    </script>
+
+</body>
+</html>
+
